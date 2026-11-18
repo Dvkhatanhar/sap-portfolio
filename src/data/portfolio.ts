@@ -291,7 +291,7 @@ export const portfolioData = {
     { value: '4', label: 'Greenfield Go-Lives', detail: 'Major SAP S/4HANA Retail Greenfield implementations delivered at Deloitte India.', icon: 'rocket', size: 'lg', accent: 'sapphire' },
     { value: '50,000+', label: 'Invoices & POs', detail: 'Processed for Chargeback sales through configured Settlement Management.', icon: 'receipt', size: 'md', accent: 'gold' },
     { value: '1,000+', label: 'Stores Supported', detail: 'Retail stores across India running on the O2C processes delivered.', icon: 'store', size: 'md', accent: 'cyan' },
-    { value: '0', label: 'Critical Defects', detail: 'Zero critical post-launch defects on custom SAP SD reports.', icon: 'shield', size: 'sm', accent: 'cyan' },
+    { value: 'ZERO', label: 'Critical Defects', detail: 'Zero critical post-launch defects on custom SAP SD reports.', icon: 'shield', size: 'sm', accent: 'cyan' },
     { value: '40%', label: 'Faster Reporting', detail: 'Reporting turnaround cut using advanced Excel and PivotTables.', icon: 'gauge', size: 'sm', accent: 'gold' },
     { value: 'Intern → Analyst', label: 'Deloitte India', detail: 'Moved from SAP SD Intern (July 2025) to SAP Functional Analyst (Jan 2026).', icon: 'trending', size: 'md', accent: 'sapphire' },
   ] as Achievement[],

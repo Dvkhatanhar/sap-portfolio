@@ -72,15 +72,15 @@ export const portfolioData = {
     github: '',
     resumeUrl: './Dev_Resume.docx',
     rotatingRoles: [
-      'SAP SD Consultant',
+      'SAP SD Analyst',
       'Order-to-Cash (O2C) Specialist',
       'S/4HANA Greenfield Implementer',
       'Pricing, Billing & Settlement',
       'Functional–Technical Bridge',
-      'Business Process Optimization',
+      'Business Process Optimisation',
     ],
     summary:
-      'SAP SD Consultant with Big 4 experience delivering large-scale Retail Greenfield implementations in SAP S/4HANA environments. With SAP SD as a foundational base skill, offers deep expertise in Order-to-Cash (O2C), Pricing, Billing, and Master Data Management. Certified in AI methodologies, bringing cross-module proficiency across SD, MM, and SCM workflows to drive EDI integration, optimize sales processes, and deliver scalable enterprise solutions.',
+      'SAP SD Analyst with Big 4 experience delivering large-scale Retail Greenfield implementations in SAP S/4HANA environments. With SAP SD as a foundational base skill, offers deep expertise in Order-to-Cash (O2C), Pricing, Billing, and Master Data Management. Certified in AI methodologies, bringing cross-module proficiency across SD, MM, and SCM workflows to drive EDI integration, optimize sales processes, and deliver scalable enterprise solutions.',
     heroStats: [
       { value: '4', label: 'Greenfield Go-Lives' },
       { value: '1,000+', label: 'Retail Stores Supported' },
@@ -141,7 +141,7 @@ export const portfolioData = {
         },
         {
           text: 'Achieved zero critical post-launch defects on custom SAP SD reports by directly collaborating with offshore ABAP developers and establishing rigorous business logic validation.',
-          metric: '0 critical defects',
+          metric: 'Zero critical defects',
         },
         {
           text: 'Led daily post-launch system support, successfully resolving critical business issues by tracking the full bug lifecycle and team tasks in Microsoft Azure.',
@@ -172,11 +172,11 @@ export const portfolioData = {
           text: 'Streamlined master data management workflows by effectively gathering and analysing critical sales process requirements during initial project scoping.',
         },
         {
-          text: 'Decreased reporting turnaround times by 40% using advanced MS Excel functions, including dynamic formatting and PivotTables, to track configuration milestones.',
+          text: 'Decreased reporting turnaround times by 40% by refining logic, including dynamic formatting, to track configuration milestones.',
           metric: '40% faster reporting',
         },
       ],
-      skills: ['sd', 'mdm', 'requirements', 'excel', 'big4'],
+      skills: ['sd', 'mdm', 'requirements', 'SAP Reporting', 'big4'],
     },
   ] as Role[],
 

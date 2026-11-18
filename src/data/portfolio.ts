@@ -113,7 +113,7 @@ export const portfolioData = {
     { id: 'greenfield', name: 'Greenfield Implementations', category: 'tools' },
     { id: 'agile', name: 'Agile / Scrum', category: 'tools' },
     { id: 'azure', name: 'Microsoft Azure (Bug Tracking)', category: 'tools' },
-    { id: 'powerbi', name: 'Power BI', category: 'tools' },
+    { id: 'SAP Reporting', name: 'SAP Reporting', category: 'tools' },
     { id: 'excel', name: 'Advanced MS Excel', category: 'tools' },
     { id: 'big4', name: 'Big 4 Consulting', category: 'tools' },
   ] as Skill[],

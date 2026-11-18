@@ -238,17 +238,17 @@ export const portfolioData = {
       skills: ['sd', 'hypercare', 'azure', 'agile'],
     },
     {
-      id: 'powerbi-dashboards',
-      title: 'Executive Power BI Dashboards',
+      id: 'SAP Reporting-dashboards',
+      title: 'Executive SAP Reporting Dashboards',
       category: 'technical',
       roleId: 'deloitte-analyst',
       challenge:
         'Leadership needed a clear view of core sales data and defect lifecycles across the implementation.',
       solution:
-        'Designed dynamic Power BI dashboards and executive line charts to visualise core sales data and defect lifecycles.',
-      modules: ['Power BI', 'Sales Data', 'Defect Analytics'],
+        'Designed dynamic SAP Reporting dashboards and executive line charts to visualise core sales data and defect lifecycles.',
+      modules: ['SAP Reporting', 'Sales Data', 'Defect Analytics'],
       impact: 'Enhanced executive decision-making capabilities.',
-      metric: { value: 'Exec', label: 'decision support' },
+      metric: { value: 'Execellent', label: 'decision support' },
       skills: ['SAP Reporting', 'sd', 'hypercare'],
     },
     {

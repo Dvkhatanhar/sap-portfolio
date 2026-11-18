@@ -140,7 +140,7 @@ export const portfolioData = {
           metric: '4 Go-Lives · 1,000+ stores · 50,000+ docs',
         },
         {
-          text: 'Achieved zero critical post-launch defects on custom SAP SD reports by directly collaborating with offshore ABAP developers and establishing rigorous business logic validation.',
+          text: 'Achieved Zero critical post-launch defects on custom SAP SD reports by directly collaborating with offshore ABAP developers and establishing rigorous business logic validation.',
           metric: 'Zero critical defects',
         },
         {
@@ -150,7 +150,7 @@ export const portfolioData = {
           text: 'Ensured seamless downstream integration (SD-MM) by spearheading comprehensive System Integration Testing (SIT) and User Acceptance Testing (UAT) workshops for enterprise end-users.',
         },
         {
-          text: 'Enhanced executive decision-making capabilities by designing dynamic Power BI dashboards and executive line charts to visualise core sales data and defect lifecycles.',
+          text: 'Enhanced executive decision-making capabilities by designing dynamic SAP SD Reports and executive line charts to visualise core sales data and defect lifecycles.',
         },
       ],
       skills: [

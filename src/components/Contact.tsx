@@ -1,5 +1,5 @@
-import { useState, type FormEvent } from 'react';
-import { CheckCircle2, Copy, Download, Github, Linkedin, Loader2, Mail, MapPin, Send } from 'lucide-react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { AlertCircle, CheckCircle2, Copy, Download, Github, Linkedin, Loader2, Mail, MapPin, RotateCcw, Send } from 'lucide-react';
 import { portfolioData } from '../data/portfolio';
 import SectionHeading from './SectionHeading';
 
@@ -17,12 +17,44 @@ type Errors = Partial<Record<keyof FormState, string>>;
 
 const empty: FormState = { name: '', email: '', company: '', type: 'Recruiter / Hiring', message: '' };
 
+/** Must match the name of the hidden static form in index.html (Netlify Forms detection). */
+const NETLIFY_FORM_NAME = 'contact';
+/** Real people take more than a few seconds to fill the form; instant submissions are almost always bots. */
+const MIN_FILL_MS = 3000;
+const MAX_LINKS = 3;
+const REQUEST_TIMEOUT_MS = 15000;
+
+type Status = 'idle' | 'sending' | 'sent' | 'error';
+
 function validate(f: FormState): Errors {
   const e: Errors = {};
   if (f.name.trim().length < 2) e.name = 'Please enter your name.';
+  else if (/https?:\/\/|www\./i.test(f.name)) e.name = 'Please enter your name without links.';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.trim())) e.email = 'Please enter a valid email address.';
   if (f.message.trim().length < 20) e.message = 'Please write at least 20 characters so I can respond properly.';
+  else if ((f.message.match(/https?:\/\/|www\./gi) ?? []).length > MAX_LINKS)
+    e.message = `Please include no more than ${MAX_LINKS} links.`;
   return e;
+}
+
+async function submitToNetlify(fields: Record<string, string>) {
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const res = await fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ 'form-name': NETLIFY_FORM_NAME, ...fields }).toString(),
+      signal: controller.signal,
+    });
+    if (!res.ok) throw new Error(`The form service responded with status ${res.status}.`);
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'AbortError') throw new Error('The request timed out.');
+    if (!navigator.onLine) throw new Error('You appear to be offline.');
+    throw err instanceof Error ? err : new Error('Network error.');
+  } finally {
+    window.clearTimeout(timer);
+  }
 }
 
 export default function Contact({ onCopyEmail }: { onCopyEmail: () => void }) {
@@ -30,7 +62,15 @@ export default function Contact({ onCopyEmail }: { onCopyEmail: () => void }) {
   const [form, setForm] = useState<FormState>(empty);
   const [errors, setErrors] = useState<Errors>({});
   const [touched, setTouched] = useState<Partial<Record<keyof FormState, boolean>>>({});
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
+  const [status, setStatus] = useState<Status>('idle');
+  const [errorDetail, setErrorDetail] = useState('');
+  const [honeypot, setHoneypot] = useState('');
+  const shownAt = useRef(Date.now());
+
+  // Restart the time trap whenever a fresh form is shown.
+  useEffect(() => {
+    if (status === 'idle') shownAt.current = Date.now();
+  }, [status]);
 
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     const next = { ...form, [key]: value };
@@ -43,8 +83,9 @@ export default function Contact({ onCopyEmail }: { onCopyEmail: () => void }) {
     setErrors(validate(form));
   };
 
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
+    if (status === 'sending') return; // guard against double submits
     const errs = validate(form);
     setErrors(errs);
     setTouched({ name: true, email: true, message: true });
@@ -52,17 +93,53 @@ export default function Contact({ onCopyEmail }: { onCopyEmail: () => void }) {
       document.getElementById(`field-${Object.keys(errs)[0]}`)?.focus();
       return;
     }
-    // Simulated send — swap in Formspree / Netlify Forms / an API route here for real delivery.
+
+    // Honeypot filled → a bot. Pretend success so it learns nothing, but send nothing.
+    if (honeypot) {
+      setStatus('sent');
+      return;
+    }
+    if (Date.now() - shownAt.current < MIN_FILL_MS) {
+      setErrorDetail('That was faster than a person can type. Please wait a moment and try again.');
+      setStatus('error');
+      return;
+    }
+
     setStatus('sending');
-    window.setTimeout(() => setStatus('sent'), 1200);
+    try {
+      await submitToNetlify({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        company: form.company.trim(),
+        type: form.type,
+        message: form.message.trim(),
+        'bot-field': honeypot,
+      });
+      setStatus('sent');
+    } catch (err) {
+      setErrorDetail(err instanceof Error ? err.message : 'Something went wrong.');
+      setStatus('error');
+    }
   };
 
   const reset = () => {
     setForm(empty);
     setErrors({});
     setTouched({});
+    setHoneypot('');
+    setErrorDetail('');
     setStatus('idle');
   };
+
+  // Keep what the visitor typed so they can retry without re-entering it.
+  const backToForm = () => {
+    setErrorDetail('');
+    setStatus('idle');
+  };
+
+  const mailtoFallback = `mailto:${profile.email}?subject=${encodeURIComponent(
+    `${form.type} inquiry from ${form.name.trim() || 'your portfolio'}`,
+  )}&body=${encodeURIComponent(form.message.trim())}`;
 
   const fieldError = (k: keyof FormState) => (touched[k] ? errors[k] : undefined);
 
@@ -129,8 +206,44 @@ export default function Contact({ onCopyEmail }: { onCopyEmail: () => void }) {
                 </p>
                 <button type="button" onClick={reset} className="btn-ghost mt-6">Send another message</button>
               </div>
+            ) : status === 'error' ? (
+              <div className="flex min-h-[380px] flex-col items-center justify-center text-center" role="alert">
+                <span className="grid h-16 w-16 place-items-center rounded-full bg-rose-500/15 text-rose-500">
+                  <AlertCircle className="h-8 w-8" aria-hidden />
+                </span>
+                <h3 className="mt-5 font-display text-2xl font-semibold text-slate-900 dark:text-white">Message not sent</h3>
+                <p className="mt-2 max-w-sm text-sm text-slate-600 dark:text-slate-400">
+                  {errorDetail} Your message is still here — try again, or email me directly instead.
+                </p>
+                <div className="mt-6 flex flex-wrap justify-center gap-3">
+                  <button type="button" onClick={backToForm} className="btn-primary">
+                    <RotateCcw className="h-4 w-4" aria-hidden /> Back to form
+                  </button>
+                  <a href={mailtoFallback} className="btn-ghost">
+                    <Mail className="h-4 w-4" aria-hidden /> Email instead
+                  </a>
+                </div>
+              </div>
             ) : (
-              <form onSubmit={submit} noValidate className="grid gap-5" aria-label="Contact form">
+              <form
+                name={NETLIFY_FORM_NAME}
+                onSubmit={submit}
+                noValidate
+                className="grid gap-5"
+                aria-label="Contact form"
+              >
+                {/* Honeypot: hidden from people and assistive tech; bots that fill every field get filtered out. */}
+                <div className="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
+                  <label htmlFor="field-bot">Leave this field empty</label>
+                  <input
+                    id="field-bot"
+                    name="bot-field"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                  />
+                </div>
                 <fieldset>
                   <legend className="mb-2 text-sm font-medium text-slate-700 dark:text-slate-200">I'm reaching out as a</legend>
                   <div className="flex flex-wrap gap-2">

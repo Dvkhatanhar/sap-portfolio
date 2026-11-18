@@ -62,7 +62,7 @@ export const portfolioData = {
     initials: 'DK',
     title: 'SAP Functional Analyst',
     company: 'Deloitte India',
-    positioning: 'SAP SD Consultant',
+    positioning: 'SAP SD Analyst',
     location: 'Thane, Maharashtra, India',
     email: 'dvkhatanhar@gmail.com',
     // Phone is kept here for your reference but is not rendered on the public site.

@@ -156,7 +156,7 @@ export const portfolioData = {
       skills: [
         'sd', 'o2c', 'pricing', 'billing', 'settlement', 'chargeback', 'sdmm', 'scm',
         'custom-reports', 'abap-collab', 'logic-validation', 'sit', 'uat', 'hypercare',
-        's4hana', 'greenfield', 'agile', 'azure', 'powerbi', 'big4',
+        's4hana', 'greenfield', 'agile', 'azure', 'SAP Reporting', 'big4',
       ],
     },
     {
@@ -249,7 +249,7 @@ export const portfolioData = {
       modules: ['Power BI', 'Sales Data', 'Defect Analytics'],
       impact: 'Enhanced executive decision-making capabilities.',
       metric: { value: 'Exec', label: 'decision support' },
-      skills: ['powerbi', 'sd', 'hypercare'],
+      skills: ['SAP Reporting', 'sd', 'hypercare'],
     },
     {
       id: 'mdm-scoping',

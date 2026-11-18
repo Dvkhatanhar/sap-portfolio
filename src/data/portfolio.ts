@@ -206,7 +206,7 @@ export const portfolioData = {
         'Worked directly with offshore ABAP developers and established rigorous business logic validation for every custom SD report.',
       modules: ['SAP SD', 'ABAP (offshore)', 'Custom Reports'],
       impact: 'Zero critical post-launch defects on custom SAP SD reports.',
-      metric: { value: '0', label: 'critical post-launch defects' },
+      metric: { value: 'Zero', label: 'critical post-launch defects' },
       skills: ['sd', 'custom-reports', 'abap-collab', 'logic-validation', 's4hana'],
     },
     {

@@ -18,6 +18,23 @@
   .glass {
     @apply rounded-2xl border border-slate-200/80 bg-white/70 shadow-sm backdrop-blur-xl
            dark:border-white/10 dark:bg-white/[0.035] dark:shadow-none;
+    /* Cursor spotlight: --mx/--my are set by the pointer listener in App.tsx. */
+    background-image: radial-gradient(420px circle at var(--mx, -999px) var(--my, -999px), rgb(10 132 255 / 0.09), transparent 45%);
+  }
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+
+  /* Scroll reveal (see components/Reveal.tsx) */
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); }
+  .reveal.is-visible { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; }
+  }
+
+  /* Rotating gradient ring around the profile photo */
+  .photo-ring {
+    background: conic-gradient(from var(--angle, 0deg), #0a84ff, #22d3ee, #f5b83d, #0a84ff);
+    animation: ring-spin 6s linear infinite;
   }
   .glass-hover {
     @apply transition duration-300 hover:-translate-y-0.5 hover:border-sapphire-500/40 hover:shadow-lg hover:shadow-sapphire-500/5
@@ -69,4 +86,21 @@
            focus:border-sapphire-500 focus:outline-none focus:ring-2 focus:ring-sapphire-500/30
            dark:border-white/10 dark:bg-obsidian-900/70 dark:text-slate-100 dark:placeholder-slate-500;
   }
+}
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes ring-spin {
+  to { --angle: 360deg; }
+}
+@keyframes float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -10px; }
+}
+@keyframes progress {
+  from { width: 0%; }
+  to { width: 100%; }
 }

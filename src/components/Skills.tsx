@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { Boxes, Code2, MousePointerClick, Wrench, type LucideIcon } from 'lucide-react';
 import { portfolioData, type SkillCategory } from '../data/portfolio';
 import { skillName, skillUsage } from '../lib/skills';
 import SectionHeading from './SectionHeading';
+import Reveal from './Reveal';
 
 const categoryIcons: Record<SkillCategory, LucideIcon> = {
   functional: Boxes,
@@ -19,28 +21,52 @@ export default function Skills({ activeSkill, onSelectSkill }: Props) {
 
   const matchedRoles = activeSkill ? experience.filter((r) => r.skills.includes(activeSkill)) : [];
   const matchedEngagements = activeSkill ? engagements.filter((e) => e.skills.includes(activeSkill)) : [];
+  // Phones show one category at a time; desktop shows all three side by side.
+  const [mobileCat, setMobileCat] = useState<SkillCategory>(skillCategories[0].id);
 
   return (
-    <section id="skills" className="py-20 sm:py-28" aria-label="SAP Ecosystem and Technical Skills">
+    <section id="skills" className="py-14 sm:py-24" aria-label="SAP Ecosystem and Technical Skills">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <SectionHeading eyebrow="04 · SAP Ecosystem & Skills" title="Skills matrix, linked to real delivery">
-          Click any capability to light up the roles and SAP engagements where it was applied — across the
-          whole page.
+        <SectionHeading eyebrow="04 · SAP Ecosystem & Skills" title="Skills matrix, linked to real delivery" showTextOnMobile>
+          Tap any capability to see the roles and SAP engagements where it was applied.
         </SectionHeading>
 
-        <div className="grid gap-5 lg:grid-cols-3">
+        <div role="tablist" aria-label="Skill categories" className="mb-4 grid grid-cols-3 gap-1 rounded-xl border border-slate-200 bg-white/60 p-1 lg:hidden dark:border-white/10 dark:bg-white/5">
           {skillCategories.map((cat) => {
             const Icon = categoryIcons[cat.id];
+            const selected = mobileCat === cat.id;
             return (
-              <div key={cat.id} className="glass p-6">
+              <button
+                key={cat.id}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                onClick={() => setMobileCat(cat.id)}
+                className={`flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs font-semibold transition ${
+                  selected ? 'bg-sapphire-500 text-white shadow' : 'text-slate-600 dark:text-slate-300'
+                }`}
+              >
+                <Icon className="h-3.5 w-3.5" aria-hidden />
+                {{ functional: 'Functional', technical: 'Technical', tools: 'Tools' }[cat.id]}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="grid gap-5 lg:grid-cols-3">
+          {skillCategories.map((cat, i) => {
+            const Icon = categoryIcons[cat.id];
+            return (
+              <Reveal key={cat.id} delay={i * 100} className={`${mobileCat === cat.id ? '' : 'hidden'} lg:block`}>
+              <div className="glass h-full p-5 sm:p-6">
                 <div className="flex items-center gap-3">
                   <span className="grid h-10 w-10 place-items-center rounded-xl bg-sapphire-500/10 text-sapphire-600 dark:text-cyan-300">
                     <Icon className="h-5 w-5" aria-hidden />
                   </span>
                   <h3 className="font-display text-lg font-semibold text-slate-900 dark:text-white">{cat.title}</h3>
                 </div>
-                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{cat.description}</p>
-                <ul className="mt-5 flex flex-wrap gap-2">
+                <p className="mt-2 hidden text-sm text-slate-500 sm:block dark:text-slate-400">{cat.description}</p>
+                <ul className="mt-4 flex flex-wrap gap-2 sm:mt-5">
                   {skills
                     .filter((s) => s.category === cat.id)
                     .map((s) => {
@@ -70,11 +96,12 @@ export default function Skills({ activeSkill, onSelectSkill }: Props) {
                     })}
                 </ul>
               </div>
+              </Reveal>
             );
           })}
         </div>
 
-        <div className="glass mt-5 p-6" aria-live="polite">
+        <div className="glass mt-4 p-5 sm:mt-5 sm:p-6" aria-live="polite">
           {activeSkill ? (
             <div className="grid gap-6 md:grid-cols-[auto_1fr_1fr] md:items-start">
               <div>

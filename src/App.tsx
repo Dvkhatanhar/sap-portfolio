@@ -11,6 +11,7 @@ import Skills from './components/Skills';
 import Education from './components/Education';
 import Contact from './components/Contact';
 import Toast from './components/Toast';
+import ScrollExtras from './components/ScrollExtras';
 
 export default function App() {
   const { theme, toggle } = useTheme();
@@ -28,6 +29,26 @@ export default function App() {
     toastTimer.current = window.setTimeout(() => setToast(null), 2600);
   }, []);
   useEffect(() => () => window.clearTimeout(toastTimer.current), []);
+
+  // Cursor spotlight on glass cards: feed the pointer position to the card under it as CSS variables.
+  useEffect(() => {
+    if (!window.matchMedia('(hover: hover)').matches) return;
+    let last: HTMLElement | null = null;
+    const onMove = (e: PointerEvent) => {
+      const card = (e.target as Element | null)?.closest?.('.glass') as HTMLElement | null;
+      if (last && last !== card) {
+        last.style.removeProperty('--mx');
+        last.style.removeProperty('--my');
+      }
+      last = card;
+      if (!card) return;
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      card.style.setProperty('--my', `${e.clientY - r.top}px`);
+    };
+    window.addEventListener('pointermove', onMove, { passive: true });
+    return () => window.removeEventListener('pointermove', onMove);
+  }, []);
 
   const copyEmail = useCallback(async () => {
     const email = portfolioData.profile.email;
@@ -54,10 +75,11 @@ export default function App() {
         Skip to content
       </a>
       <Navbar active={active} theme={theme} onToggleTheme={toggle} />
+      <ScrollExtras />
       <main>
         <Hero onCopyEmail={copyEmail} />
         <Engagements activeSkill={activeSkill} onClearSkill={() => setActiveSkill(null)} />
-        <Timeline activeSkill={activeSkill} onSelectSkill={setActiveSkill} />
+        <Timeline />
         <Impact />
         <Skills activeSkill={activeSkill} onSelectSkill={setActiveSkill} />
         <Education />

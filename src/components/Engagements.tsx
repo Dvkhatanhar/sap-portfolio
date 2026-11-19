@@ -1,5 +1,6 @@
-import { useMemo, useState, type ReactNode } from 'react';
-import { AlertTriangle, ArrowDown, Blocks, Cable, Database, Layers, TrendingUp, Workflow, type LucideIcon } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { AlertTriangle, ArrowDown, Blocks, Cable, ChevronLeft, ChevronRight, Database, Layers, TrendingUp, Workflow, type LucideIcon } from 'lucide-react';
+import CountUp from './CountUp';
 import { portfolioData, type EngagementCategory } from '../data/portfolio';
 import { roleById } from '../lib/skills';
 import SectionHeading from './SectionHeading';
@@ -28,15 +29,51 @@ export default function Engagements({ activeSkill, onClearSkill }: Props) {
   );
   const matchCount = activeSkill ? engagements.filter((e) => e.skills.includes(activeSkill)).length : 0;
 
+  // Mobile carousel: track which card is centred, and jump back to the start when the tab changes.
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [slide, setSlide] = useState(0);
+
+  useEffect(() => {
+    panelRef.current?.scrollTo({ left: 0 });
+    setSlide(0);
+  }, [tab]);
+
+  // When a skill is picked elsewhere, bring the first matching card into view in the carousel.
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel || !activeSkill) return;
+    const idx = visible.findIndex((e) => e.skills.includes(activeSkill));
+    const card = panel.children[idx] as HTMLElement | undefined;
+    if (card) panel.scrollTo({ left: card.offsetLeft - panel.offsetLeft - 16, behavior: 'smooth' });
+  }, [activeSkill, visible]);
+
+  const onScroll = () => {
+    const panel = panelRef.current;
+    if (!panel) return;
+    const cards = Array.from(panel.children) as HTMLElement[];
+    const centre = panel.scrollLeft + panel.clientWidth / 2;
+    let best = 0;
+    cards.forEach((c, i) => {
+      if (Math.abs(c.offsetLeft - panel.offsetLeft + c.clientWidth / 2 - centre) < Math.abs(cards[best].offsetLeft - panel.offsetLeft + cards[best].clientWidth / 2 - centre)) best = i;
+    });
+    setSlide(best);
+  };
+
+  const goTo = (i: number) => {
+    const panel = panelRef.current;
+    const card = panel?.children[i] as HTMLElement | undefined;
+    if (panel && card) panel.scrollTo({ left: card.offsetLeft - panel.offsetLeft - 16, behavior: 'smooth' });
+  };
+
   return (
-    <section id="engagements" className="py-20 sm:py-28" aria-label="Enterprise SAP Work">
+    <section id="engagements" className="py-14 sm:py-24" aria-label="Enterprise SAP Work">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading eyebrow="01 · Enterprise SAP Work" title="SAP engagements, from business challenge to measurable impact">
           Each initiative from my Deloitte India delivery, framed the way a steering committee reads it: the business
           problem, the SAP solution, and the result.
         </SectionHeading>
 
-        <div role="tablist" aria-label="Engagement categories" className="mb-8 flex gap-2 overflow-x-auto pb-1">
+        <div role="tablist" aria-label="Engagement categories" className="no-scrollbar -mx-4 mb-5 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:mb-8 sm:px-0">
           {engagementTabs.map((t) => {
             const count = t.id === 'all' ? engagements.length : engagements.filter((e) => e.category === t.id).length;
             const selected = tab === t.id;
@@ -62,15 +99,24 @@ export default function Engagements({ activeSkill, onClearSkill }: Props) {
 
         <SkillFilterBanner activeSkill={activeSkill} onClear={onClearSkill} matches={matchCount} noun="engagement" />
 
-        <div id="engagement-panel" role="tabpanel" aria-labelledby={`tab-${tab}`} className="grid gap-5 md:grid-cols-2">
-          {visible.map((e) => {
+        <div
+          id="engagement-panel"
+          role="tabpanel"
+          aria-labelledby={`tab-${tab}`}
+          ref={panelRef}
+          onScroll={onScroll}
+          className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 pt-1 md:mx-0 md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:px-0 md:pb-0"
+        >
+          {visible.map((e, i) => {
             const meta = categoryMeta[e.category];
             const role = roleById(e.roleId);
             const matched = activeSkill ? e.skills.includes(activeSkill) : null;
             return (
               <article
                 key={e.id}
-                className={`glass glass-hover flex flex-col p-6 ${matched === true ? 'ring-2 ring-gold-400' : ''} ${
+                aria-roledescription="slide"
+                aria-label={`${i + 1} of ${visible.length}`}
+                className={`glass glass-hover flex w-[86%] shrink-0 snap-center flex-col p-5 sm:p-6 md:w-auto ${matched === true ? 'ring-2 ring-gold-400' : ''} ${
                   matched === false ? 'opacity-40 saturate-50' : ''
                 }`}
                 aria-labelledby={`eng-${e.id}`}
@@ -114,14 +160,42 @@ export default function Engagements({ activeSkill, onClearSkill }: Props) {
                   </Step>
                 </ol>
 
-                <div className="mt-auto border-t border-slate-200 pt-5 dark:border-white/10">
-                  <p className="font-display text-3xl font-bold text-gold-500 dark:text-gold-400">{e.metric.value}</p>
+                <div className="mt-auto border-t border-slate-200 pt-4 sm:pt-5 dark:border-white/10">
+                  <p className="font-display text-2xl font-bold text-gold-500 sm:text-3xl dark:text-gold-400">
+                    <CountUp value={e.metric.value} />
+                  </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400">{e.metric.label}</p>
                 </div>
               </article>
             );
           })}
         </div>
+
+        {/* Mobile carousel controls */}
+        {visible.length > 1 && (
+          <div className="mt-4 flex items-center justify-between md:hidden">
+            <div className="flex gap-1.5" role="group" aria-label="Choose engagement">
+              {visible.map((e, i) => (
+                <button
+                  key={e.id}
+                  type="button"
+                  onClick={() => goTo(i)}
+                  aria-label={`Show engagement ${i + 1}: ${e.title}`}
+                  aria-current={slide === i}
+                  className={`h-2 rounded-full transition-all ${slide === i ? 'w-6 bg-sapphire-500' : 'w-2 bg-slate-300 dark:bg-white/20'}`}
+                />
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <button type="button" onClick={() => goTo(Math.max(0, slide - 1))} disabled={slide === 0} className="icon-btn h-9 w-9 disabled:opacity-40" aria-label="Previous engagement">
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+              </button>
+              <button type="button" onClick={() => goTo(Math.min(visible.length - 1, slide + 1))} disabled={slide === visible.length - 1} className="icon-btn h-9 w-9 disabled:opacity-40" aria-label="Next engagement">
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

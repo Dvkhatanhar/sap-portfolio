@@ -144,7 +144,7 @@ export default function Contact({ onCopyEmail }: { onCopyEmail: () => void }) {
   const fieldError = (k: keyof FormState) => (touched[k] ? errors[k] : undefined);
 
   return (
-    <section id="contact" className="relative overflow-hidden py-20 sm:py-28" aria-label="Contact">
+    <section id="contact" className="relative overflow-hidden py-14 sm:py-24" aria-label="Contact">
       <div className="pointer-events-none absolute bottom-0 left-1/2 h-80 w-[700px] -translate-x-1/2 rounded-full bg-sapphire-600/15 blur-[120px]" aria-hidden />
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading eyebrow="06 · Let's Talk" title="Planning an S/4HANA rollout or hiring for SAP SD?">
@@ -152,8 +152,24 @@ export default function Contact({ onCopyEmail }: { onCopyEmail: () => void }) {
           send a note and I'll get back to you.
         </SectionHeading>
 
+        {/* Phones: one compact row of contact actions instead of the full sidebar */}
+        <div className="mb-4 grid grid-cols-4 gap-2 lg:hidden">
+          <a href={`mailto:${profile.email}`} className="glass flex flex-col items-center gap-1 py-3 text-[11px] font-medium text-slate-700 dark:text-slate-200">
+            <Mail className="h-4 w-4 text-sapphire-500" aria-hidden /> Email
+          </a>
+          <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="glass flex flex-col items-center gap-1 py-3 text-[11px] font-medium text-slate-700 dark:text-slate-200" aria-label="LinkedIn profile (opens in new tab)">
+            <Linkedin className="h-4 w-4 text-sapphire-500" aria-hidden /> LinkedIn
+          </a>
+          <button type="button" onClick={onCopyEmail} className="glass flex flex-col items-center gap-1 py-3 text-[11px] font-medium text-slate-700 dark:text-slate-200">
+            <Copy className="h-4 w-4 text-sapphire-500" aria-hidden /> Copy
+          </button>
+          <a href={profile.resumeUrl} download="Dev_Khatanhar_Resume.docx" className="glass flex flex-col items-center gap-1 py-3 text-[11px] font-medium text-slate-700 dark:text-slate-200">
+            <Download className="h-4 w-4 text-gold-500" aria-hidden /> Resume
+          </a>
+        </div>
+
         <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-          <aside className="glass flex flex-col gap-4 p-6">
+          <aside className="glass hidden flex-col gap-4 p-6 lg:flex">
             <a href={`mailto:${profile.email}`} className="group flex items-center gap-3 rounded-xl p-2 -m-2 transition hover:bg-slate-900/5 dark:hover:bg-white/5">
               <span className="grid h-11 w-11 place-items-center rounded-xl bg-sapphire-500/10 text-sapphire-600 dark:text-cyan-300"><Mail className="h-5 w-5" aria-hidden /></span>
               <span>
@@ -194,7 +210,7 @@ export default function Contact({ onCopyEmail }: { onCopyEmail: () => void }) {
             </div>
           </aside>
 
-          <div className="glass p-6 sm:p-8">
+          <div className="glass p-5 sm:p-8">
             {status === 'sent' ? (
               <div className="flex min-h-[380px] flex-col items-center justify-center text-center" role="status" aria-live="polite">
                 <span className="grid h-16 w-16 place-items-center rounded-full bg-emerald-500/15 text-emerald-500">

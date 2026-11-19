@@ -248,7 +248,7 @@ export const portfolioData = {
         'Designed dynamic SAP Reporting dashboards and executive line charts to visualise core sales data and defect lifecycles.',
       modules: ['SAP Reporting', 'Sales Data', 'Defect Analytics'],
       impact: 'Enhanced executive decision-making capabilities.',
-      metric: { value: 'Execellent', label: 'decision support' },
+      metric: { value: 'Excellent ', label: 'decision support' },
       skills: ['SAP Reporting', 'sd', 'hypercare'],
     },
     {
